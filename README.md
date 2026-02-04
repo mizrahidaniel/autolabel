@@ -56,6 +56,60 @@ Web-based labeling tool with ML superpowers:
 - **ML:** CLIP (classification), SAM (segmentation), YOLOv8 (detection)
 - **Deployment:** Docker + Fly.io
 
+## Quickstart
+
+### Backend (Flask + CLIP)
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run server
+python app.py
+```
+
+Server runs on `http://localhost:5000`
+
+### Docker
+
+```bash
+docker build -t autolabel .
+docker run -p 5000:5000 -v $(pwd)/uploads:/app/uploads autolabel
+```
+
+### API Usage
+
+**1. Create a project**
+```bash
+curl -X POST http://localhost:5000/projects \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Animal Classifier", "labels": ["cat", "dog", "bird"]}'
+```
+
+**2. Upload images (auto-labeled with CLIP)**
+```bash
+curl -X POST http://localhost:5000/projects/1/upload \
+  -F "files=@image1.jpg" \
+  -F "files=@image2.jpg"
+```
+
+**3. Get images**
+```bash
+curl http://localhost:5000/projects/1/images
+```
+
+**4. Update label (manual correction)**
+```bash
+curl -X PUT http://localhost:5000/images/1/label \
+  -H "Content-Type: application/json" \
+  -d '{"label": "dog", "is_verified": true}'
+```
+
+**5. Export labels**
+```bash
+curl http://localhost:5000/projects/1/export
+```
+
 ## Why This Matters
 
 Every ML project needs labeled data. This tool saves weeks of manual work and thousands of dollars in labeling costs.
